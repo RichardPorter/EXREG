@@ -79,6 +79,7 @@ class ntregmanipulator
 	NT_DELETE_KEY NtDeleteKeyStruct;
 	HMODULE ntdllModule;
 	NT_DELETE_VALUE_KEY NtDeleteValueKeyStruct;
+	NT_CREATE_KEY NtCreateKeyStruct;
 public:
 	ntregmanipulator();
 	~ntregmanipulator();
@@ -87,5 +88,7 @@ public:
 	UNICODE_STRING unescapestring(std::string escapedstr);
 	int DeleteKeyByName(UNICODE_STRING key_name);
 	int DeleteKeyValue(HANDLE key_handle, UNICODE_STRING value_name);
+	int DeleteKeyValueByName(UNICODE_STRING key_name, UNICODE_STRING value_name);
+	int CreateKey(UNICODE_STRING key_name);
 };
 

@@ -42,17 +42,22 @@ int commandparsing::runcommand(int argc, std::vector<std::string> arguments, cha
 			commandresult=ntreg.DeleteKeyByName(key_name);
 			exit(commandresult);
 		}
-		else if (arguments[2] == "/v") {
-			//DELETE VALUE by name
-			;
+		else if (arguments[2] == "/v" && argc>=4) {
+			key_name = ntreg.unescapestring(arguments[1]);
+			value_name = ntreg.unescapestring(arguments[3]);
+			ntreg.DeleteKeyValueByName(key_name, value_name);
 		}
-		else if (arguments[2] == "ve") {
-			//DELETE empty value
-			;
+		else if (arguments[2] == "/ve") {
+			key_name = ntreg.unescapestring(arguments[1]);
+			value_name.Length = 0;
+			ntreg.DeleteKeyValueByName(key_name, value_name);
 		}
 		else if (arguments[2] == "/va") {
 			//delete key
+			key_name = ntreg.unescapestring(arguments[1]);
+			commandresult = ntreg.DeleteKeyByName(key_name);
 			//create key
+			commandresult = ntreg.CreateKey(key_name);
 			;
 		}
 		else {

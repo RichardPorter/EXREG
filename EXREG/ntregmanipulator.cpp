@@ -11,6 +11,7 @@ ntregmanipulator::ntregmanipulator()
 	NT_OPEN_KEY NtOpenKeyStruct=NULL;
 	NT_DELETE_KEY NtDeleteKeyStruct = NULL;
 	NT_DELETE_VALUE_KEY NtDeleteValueKeyStruct = NULL;
+	NT_CREATE_KEY NtCreateKeyStruct = NULL;
 	ntdllModule = LoadLibrary(_T("ntdll.dll"));
 
 }
@@ -86,4 +87,29 @@ int ntregmanipulator::DeleteKeyValue(HANDLE key_handle, UNICODE_STRING value_nam
 	result = NtDeleteValueKeyStruct(key_handle, &value_name);
 	if (NT_SUCCESS(result)) { return 0; }
 	else { return 1; }
+}
+int ntregmanipulator::DeleteKeyValueByName(UNICODE_STRING key_name, UNICODE_STRING value_name)
+{
+	int result;
+	HANDLE key_handle = OpenKey(key_name, GENERIC_ALL);
+	result=DeleteKeyValue(key_handle,value_name);
+	CloseHandle(key_handle);
+	return result;
+}
+int ntregmanipulator::CreateKey(UNICODE_STRING key_name)
+{
+	int result;
+	HANDLE key_handle;
+	OBJECT_ATTRIBUTES KeyAttributes;
+	KeyAttributes.Length = sizeof(OBJECT_ATTRIBUTES);
+	KeyAttributes.RootDirectory = NULL;
+	KeyAttributes.ObjectName = &key_name;
+	KeyAttributes.Attributes = OBJ_CASE_INSENSITIVE;
+	KeyAttributes.SecurityDescriptor = NULL;
+	KeyAttributes.SecurityQualityOfService = NULL;
+	if (NtCreateKeyStruct == NULL)
+		NtCreateKeyStruct = (NT_CREATE_KEY)GetProcAddress(ntdllModule, "NtCreateKey");
+	result = NtCreateKeyStruct(&key_handle, GENERIC_ALL, &KeyAttributes, 0, NULL, 0, NULL);
+	CloseHandle(key_handle);
+	return result;
 }
