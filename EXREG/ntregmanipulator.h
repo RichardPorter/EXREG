@@ -73,6 +73,16 @@ typedef NTSTATUS(__stdcall *NT_DELETE_VALUE_KEY)(
 	_In_ HANDLE          KeyHandle,
 	_In_ PUNICODE_STRING ValueName
 );
+
+typedef NTSTATUS(__stdcall *NT_SET_VALUE_KEY)(
+	_In_     HANDLE          KeyHandle,
+	_In_     PUNICODE_STRING ValueName,
+	_In_opt_ ULONG           TitleIndex,
+	_In_     ULONG           Type,
+	_In_opt_ PVOID           Data,
+	_In_     ULONG           DataSize
+);
+
 class ntregmanipulator
 {
 	NT_OPEN_KEY NtOpenKeyStruct;
@@ -80,6 +90,7 @@ class ntregmanipulator
 	HMODULE ntdllModule;
 	NT_DELETE_VALUE_KEY NtDeleteValueKeyStruct;
 	NT_CREATE_KEY NtCreateKeyStruct;
+	NT_SET_VALUE_KEY NtSetValueKeyStruct;
 public:
 	ntregmanipulator();
 	~ntregmanipulator();
@@ -90,5 +101,6 @@ public:
 	int DeleteKeyValue(HANDLE key_handle, UNICODE_STRING value_name);
 	int DeleteKeyValueByName(UNICODE_STRING key_name, UNICODE_STRING value_name);
 	int CreateKey(UNICODE_STRING key_name);
+	int SetKeyValue(UNICODE_STRING key_name, UNICODE_STRING value_name, ULONG value_type, ULONG data_length, VOID * data);
 };
 
