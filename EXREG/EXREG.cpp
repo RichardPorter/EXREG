@@ -22,8 +22,8 @@
 
 int main(int argc, char  * argv[])
 {
-		if (argc == 1)
-		return 0;
+	if (argc <3)
+		exit(1);
 	std::vector<std::string> arguments = {};
 	for (int i = 1;i < argc;i++)
 		arguments.push_back(std::string(argv[i]));

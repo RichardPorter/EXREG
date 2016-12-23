@@ -12,6 +12,8 @@
 #include <vector>
 #include <map>
 #include <algorithm>
+#include <iomanip>
+#include <sstream>
 typedef enum _KEY_INFORMATION_CLASS {
 	KeyBasicInformation = 0,
 	KeyNodeInformation = 1,
@@ -40,6 +42,20 @@ typedef struct _KEY_VALUE_PARTIAL_INFORMATION {
 	ULONG DataLength;
 	UCHAR Data[1];
 } KEY_VALUE_PARTIAL_INFORMATION, *PKEY_VALUE_PARTIAL_INFORMATION;
+typedef struct _KEY_VALUE_BASIC_INFORMATION {
+	ULONG TitleIndex;
+	ULONG Type;
+	ULONG NameLength;
+	WCHAR Name[1];
+} KEY_VALUE_BASIC_INFORMATION, *PKEY_VALUE_BASIC_INFORMATION;
+
+typedef struct _KEY_BASIC_INFORMATION {
+	LARGE_INTEGER LastWriteTime;
+	ULONG         TitleIndex;
+	ULONG         NameLength;
+	WCHAR         Name[1];
+} KEY_BASIC_INFORMATION, *PKEY_BASIC_INFORMATION;
+
 
 typedef NTSTATUS(__stdcall *NT_OPEN_KEY)(OUT PHANDLE KeyHandle, IN ACCESS_MASK DesiredAccess, IN POBJECT_ATTRIBUTES ObjectAttributes);
 typedef NTSTATUS(__stdcall *NT_CREATE_KEY)(OUT PHANDLE KeyHandle, IN ACCESS_MASK DesiredAccess, IN POBJECT_ATTRIBUTES ObjectAttributes, __reserved ULONG TitleIndex, __in_opt PUNICODE_STRING Class, IN ULONG CreateOptions, __out_opt PULONG Disposition);
@@ -83,6 +99,15 @@ typedef NTSTATUS(__stdcall *NT_SET_VALUE_KEY)(
 	_In_     ULONG           DataSize
 );
 
+typedef NTSTATUS(__stdcall *NT_QUERY_VALUE_KEY)(
+	_In_      HANDLE                      KeyHandle,
+	_In_      PUNICODE_STRING             ValueName,
+	_In_      KEY_VALUE_INFORMATION_CLASS KeyValueInformationClass,
+	_Out_opt_ PVOID                       KeyValueInformation,
+	_In_      ULONG                       Length,
+	_Out_     PULONG                      ResultLength
+);
+
 class ntregmanipulator
 {
 	NT_OPEN_KEY NtOpenKeyStruct;
@@ -91,6 +116,10 @@ class ntregmanipulator
 	NT_DELETE_VALUE_KEY NtDeleteValueKeyStruct;
 	NT_CREATE_KEY NtCreateKeyStruct;
 	NT_SET_VALUE_KEY NtSetValueKeyStruct;
+	NT_ENUMERATE_KEY NtEnumKeyStruct;
+	NT_ENUMERATE_VALUE_KEY NtEnumValueKeyStruct;
+	NT_QUERY_VALUE_KEY NtQueryValueKeyStruct;
+	std::map<int, std::string> reg_type_to_string;
 public:
 	ntregmanipulator();
 	~ntregmanipulator();
@@ -102,5 +131,10 @@ public:
 	int DeleteKeyValueByName(UNICODE_STRING key_name, UNICODE_STRING value_name);
 	int CreateKey(UNICODE_STRING key_name);
 	int SetKeyValue(UNICODE_STRING key_name, UNICODE_STRING value_name, ULONG value_type, ULONG data_length, VOID * data);
+	std::string QueryKeyByName(UNICODE_STRING key_name, bool recurse);
+	std::string QueryKeyValueByName(UNICODE_STRING key_name, UNICODE_STRING value_name);
+
+	std::string QueryKeyByHandle(HANDLE key_handle, bool recurse);
+	std::string escapestring(UNICODE_STRING toescape);
 };
 
