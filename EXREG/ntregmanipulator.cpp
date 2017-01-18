@@ -275,7 +275,9 @@ std::string ntregmanipulator::QueryKeyValueByName(UNICODE_STRING key_name, UNICO
 	}
 	else
 	{
-		value_data_string.Length = value_buffer->DataLength-2;
+		value_data_string.Length = max(value_buffer->DataLength-2,0);
+		if (value_buffer->Type == REG_MULTI_SZ)
+			value_data_string.Length = max(0, value_data_string.Length - 2);
 		value_data_string.MaximumLength = value_buffer->DataLength;
 		value_data_string.Buffer = (PWSTR)&value_buffer->Data;
 		value_data= "    " + value_name_string + "    " + reg_type_to_string[value_buffer->Type] + "    " + escapestring(value_data_string);
